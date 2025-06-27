@@ -1,9 +1,21 @@
-from pymongo import MongoClient
+import mongoengine
 
 class MongoConnection:
-    def __init__(self, uri="mongodb+srv://admin:admin@cluster0.ufpsji9.mongodb.net/", db_name="mercadolivre"):
-        self.client = MongoClient(uri)
-        self.db = self.client[db_name]
+    MONGODB_URI = "mongodb://localhost:27017/"
+    MONGODB_DB  = "mercadolivre"
 
-    def get_collection(self, name):
-        return self.db[name]
+    def __init__(self, uri=MONGODB_URI, db_name=MONGODB_DB, alias="default"):
+        self.uri = uri
+        self.db_name = db_name
+        self.alias = alias
+        self.connect()
+
+    def connect(self):
+        mongoengine.connect(
+            db=self.db_name,
+            host=self.uri,
+            alias=self.alias
+        )
+
+    def disconnect(self):
+        mongoengine.disconnect(alias=self.alias)

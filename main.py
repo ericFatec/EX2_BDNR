@@ -1,4 +1,4 @@
-import mongoengine
+from database import MongoConnection
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from controllers import (
@@ -9,19 +9,14 @@ from controllers import (
     avaliacao_router
 )
 
-MONGODB_URI = "mongodb://localhost:27017/"
-MONGODB_DB  = "mercadolivre"
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    mongoengine.connect(
-        db=MONGODB_DB,
-        host=MONGODB_URI,
-        alias="default"
-    )
+    db_conn = MongoConnection()
+    app.state.db_conn = db_conn
+
     print("Conectado ao banco.")
     yield
-    mongoengine.disconnect(alias="default")
+    db_conn.disconnect()
     print("Desconectado do banco.")
 
 app = FastAPI(
